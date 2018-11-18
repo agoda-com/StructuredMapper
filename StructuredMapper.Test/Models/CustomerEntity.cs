@@ -12,7 +12,6 @@ namespace StructuredMapper.Test.Models
         public AddressEntity ShippingAddress { get; set; }
         public int CustomerNumber { get; set; }
         public DateTime DateJoined { get; set; }
-        
     }
 
     public class AddressEntity

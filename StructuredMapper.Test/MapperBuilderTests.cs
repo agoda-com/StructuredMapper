@@ -71,7 +71,7 @@ namespace StructuredMapper.Test
         }
 
         [Test]
-        public void MapperBuilder_WithDuplicateProperties_Throws()
+        public void ForProperty_WithDuplicatePropertyExpressions_Throws()
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
@@ -82,7 +82,7 @@ namespace StructuredMapper.Test
         }
 
         [Test]
-        public void MapperBuilder_WithDuplicateObjects_Throws()
+        public void ForObject_WithDuplicateObjectExpressions_Throws()
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
@@ -93,7 +93,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public void MapperBuilder_ForPropertyWithNonMemberAccessTypeExpression_Throws()
+        public void ForProperty_WithNonMemberAccessTypeExpression_Throws()
         {
             Assert.Throws<ArgumentException>(() =>
             {
@@ -103,7 +103,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public void MapperBuilder_ForObjectWithNonParameterTypeExpression_Throws()
+        public void ForObject_WithNonParameterTypeExpression_Throws()
         {
             Assert.Throws<ArgumentException>(() =>
             {
@@ -113,7 +113,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public void MapperBuilder_WithNoMappers_Throws()
+        public void Build_WithNoMappers_Throws()
         {
             Assert.Throws<InvalidOperationException>(() =>
             {
@@ -123,10 +123,21 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForSimpleProperty_Works()
+        public void BuildSync_WithAsynchronousMappers_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                new MapperBuilder<CustomerEntity, CustomerDto>()
+                    .ForProperty(to => to.DateJoined, Task.FromResult(new DateTime()))
+                    .BuildSync();
+            });
+        }
+        
+        [Test]
+        public async Task ForProperty_WithLiteralValue_Works()
         {
             var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
-                .ForProperty(to => to.First, from => from.FirstName)
+                .ForProperty(to => to.First, "Mike")
                 .Build();
 
             var mapped = await customerContactMapper(_customerEntity);
@@ -135,7 +146,31 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForComplexProperty_Works()
+        public async Task ForProperty_WithAsyncLiteralValue_Works()
+        {
+            var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
+                .ForProperty(to => to.First, Task.FromResult("Mike"))
+                .Build();
+
+            var mapped = await customerContactMapper(_customerEntity);
+            
+            Assert.AreEqual("Mike", mapped.First);
+        }
+        
+        [Test]
+        public async Task ForProperty_WithSimpleProperty_Works()
+        {
+            var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
+                .ForProperty(to => to.First, from => "Mike")
+                .Build();
+
+            var mapped = await customerContactMapper(_customerEntity);
+            
+            Assert.AreEqual("Mike", mapped.First);
+        }
+        
+        [Test]
+        public async Task ForProperty_WithComplexProperty_Works()
         {
             var customerMapper = new MapperBuilder<CustomerEntity, CustomerDto>()
                 .ForProperty(to => to.Contact.First, from => from.FirstName)
@@ -147,7 +182,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForPropertyWithStaticMethod_Works()
+        public async Task ForProperty_WithStaticMapper_Works()
         {
             var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
                 .ForProperty(to => to.PhoneNumber, from => PhoneNumberFormatter.ToInternational(from.PhoneNumber))
@@ -159,7 +194,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForAsyncProperty_Works()
+        public async Task ForProperty_WithAsyncMapper_Works()
         {   
             var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
                 .ForProperty(to => to.HomeAddress, from => _addressService.Transform(from.HomeAddress))
@@ -172,7 +207,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_WithComposition_Works()
+        public async Task Build_WithComposition_Works()
         {
             var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
                 .ForProperty(to => to.PhoneNumber, from => PhoneNumberFormatter.ToInternational(from.PhoneNumber))
@@ -188,7 +223,31 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForObject_Works()
+        public async Task ForObject_WithLiteralValue_Works()
+        {
+            var addressMapper = new MapperBuilder<AddressEntity, AddressDto>()
+                .ForObject(to => to, new AddressDto { Street = "123 Fake St" })
+                .Build();
+
+            var mapped = await addressMapper(_addressEntity);
+
+            Assert.AreEqual("123 Fake St", mapped.Street);
+        }
+
+        [Test]
+        public async Task ForObject_WithAsyncLiteralValue_Works()
+        {
+            var addressMapper = new MapperBuilder<AddressEntity, AddressDto>()
+                .ForObject(to => to, Task.FromResult(new AddressDto { Street = "123 Fake St" }))
+                .Build();
+
+            var mapped = await addressMapper(_addressEntity);
+
+            Assert.AreEqual("123 Fake St", mapped.Street);
+        }
+        
+        [Test]
+        public async Task ForObject_WithSynchronousMapper_Works()
         {
             var addressMapper = new MapperBuilder<AddressEntity, AddressDto>()
                 .ForObject(to => to, from => new AddressDto { Street = from.Street })
@@ -200,7 +259,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForAsyncObject_Works()
+        public async Task ForObject_WithAsyncMapper_Works()
         {
             var addressMapper = new MapperBuilder<AddressEntity, AddressDto>()
                 .ForObject(to => to, from => _addressService.Transform(from))
@@ -212,7 +271,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Mapper_ForRecursiveClass_Works()
+        public async Task ForProperty_WithRecursiveClass_Works()
         {
             var addressMapper = new MapperBuilder<RecursiveEntity, RecursiveDto>()
                 .ForProperty(to => to.Recursive, from => new RecursiveDto())
@@ -222,12 +281,24 @@ namespace StructuredMapper.Test
 
             Assert.IsNotNull(mapped.Recursive);
         }
+
+        [Test]
+        public void BuildSync_Works()
+        {
+            var mapper = new MapperBuilder<CustomerEntity, CustomerDto>()
+                .ForProperty(to => to.DateJoined, from => from.DateJoined)
+                .BuildSync();
+
+            var mapped = mapper(_customerEntity);
+            
+            Assert.AreEqual(_customerEntity.DateJoined, mapped.DateJoined);
+        }
         
         [Test]
-        public async Task Mapper_WithEverything_Works()
+        public async Task Build_WithFullExample_Works()
         {                
             var customerContactMapper = new MapperBuilder<CustomerEntity, ContactDto>()
-                .ForProperty(to => to.First,          from => from.FirstName)
+                .ForProperty(to => to.First,          "Mikey")
                 .ForProperty(to => to.Last,           from => from.Surname)
                 .ForProperty(to => to.PhoneNumber,    from => PhoneNumberFormatter.ToInternational(from.PhoneNumber))
                 .ForProperty(to => to.HomeAddress,    from => _addressService.Transform(from.HomeAddress))
@@ -242,6 +313,7 @@ namespace StructuredMapper.Test
 
             var mapped = await customerMapper(_customerEntity);
 
+            Assert.AreEqual("Mikey", mapped.Contact.First);
             Assert.AreEqual("12345", mapped.CustomerId);
             Assert.AreEqual(_customerEntity.DateJoined, mapped.DateJoined);
             Assert.AreEqual("Thailand", mapped.Contact.OtherAddresses.First().CountryName);
