@@ -15,8 +15,9 @@ namespace StructuredMapper
             if (toExpression.Body.NodeType != ExpressionType.MemberAccess)
             {
                 var msg =
-                    $"The given {nameof(ExpressionType)} should be of type {nameof(ExpressionType.MemberAccess)}. " +
-                    $"Instead, {toExpression.Body.NodeType} was found.";
+                    $"The supplied {nameof(ExpressionType)} should be of type {nameof(ExpressionType.MemberAccess)}. " +
+                    $"Instead, an {nameof(ExpressionType)} of {toExpression.Body.NodeType} was supplied. " +
+                    $"Expression should be something like to => to.TargetProperty.";
                 throw new ArgumentException(msg, nameof(toExpression)); 
             }
             _setProperty = CompileSetter(toExpression); 
@@ -45,7 +46,7 @@ namespace StructuredMapper
         }
         
         /// <summary>
-        /// Sets the property to the mapped value.
+        /// Sets the previously specified property to the mapped value.
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
@@ -66,15 +67,15 @@ namespace StructuredMapper
 
         private static Action<TTo, TToProp> CompileSetter(Expression<Func<TTo, TToProp>> toExpression) 
         { 
-            //    Input model 
+            // Input model 
             var toProp = toExpression.Parameters[0]; 
-            //    Input value to set 
+            // Input value to set 
             var value = Expression.Variable(typeof(TToProp), "toProperty"); 
-            //    Member access 
+            // Member access 
             var member = toExpression.Body; 
-            //    We turn the access into an assignation to the input value 
+            // We turn the access into an assignation to the input value 
             var assignation = Expression.Assign(member, value); 
-            //    We wrap the action into a lambda expression with parameters 
+            // We wrap the action into a lambda expression with parameters 
             var assignLambda = Expression.Lambda<Action<TTo, TToProp>>(assignation, toProp, value);
 
             return assignLambda.Compile();

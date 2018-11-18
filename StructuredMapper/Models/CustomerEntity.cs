@@ -9,8 +9,9 @@ namespace StructuredMapper.Models
         public string PhoneNumber { get; set; }
         public AddressEntity HomeAddress { get; set; }
         public AddressEntity BusinessAddress { get; set; }
+        public AddressEntity ShippingAddress { get; set; }
         public int CustomerNumber { get; set; }
-        public DateTime Joined { get; set; }
+        public DateTime DateJoined { get; set; }
         
     }
 

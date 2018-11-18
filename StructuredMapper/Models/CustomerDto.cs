@@ -6,7 +6,7 @@ namespace StructuredMapper.Models
     {
         public string CustomerId { get; set; }
         public DateTime DateJoined { get; set; }
-        public ContactDto Contact { get; set; }
+        public ContactDto Contact { get; set; } = new ContactDto();
     }
     
     public class ContactDto
@@ -14,7 +14,8 @@ namespace StructuredMapper.Models
         public string First { get; set; }
         public string Last { get; set; }
         public string PhoneNumber { get; set; }
-        public AddressDto[] Addresses { get; set; }
+        public AddressDto HomeAddress { get; set; }
+        public AddressDto[] OtherAddresses { get; set; }
     }
     
     public class AddressDto

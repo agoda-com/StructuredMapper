@@ -13,7 +13,7 @@ namespace StructuredMapper
         private readonly List<Func<TFrom, TTo, Task<TTo>>> _mappers = new List<Func<TFrom, TTo, Task<TTo>>>();
 
         /// <summary>
-        /// Describes a mapping that will run asynchronously.
+        /// Describes a mapping that will executed asynchronously.
         /// </summary>
         public MapperBuilder<TFrom, TTo> For<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
@@ -26,7 +26,7 @@ namespace StructuredMapper
         }
         
         /// <summary>
-        /// Describes a mapping that will run synchronously.
+        /// Describes a mapping that will executed synchronously.
         /// </summary>
         public MapperBuilder<TFrom, TTo> For<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
