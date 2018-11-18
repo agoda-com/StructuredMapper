@@ -1,6 +1,6 @@
 using System;
 
-namespace StructuredMapper.Models
+namespace StructuredMapper.Test.Models
 {
     public class CustomerDto
     {

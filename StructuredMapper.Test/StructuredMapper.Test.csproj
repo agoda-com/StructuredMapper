@@ -61,7 +61,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MapperBuilderTests.cs" />
+    <Compile Include="Models\CustomerDto.cs" />
+    <Compile Include="Models\CustomerEntity.cs" />
+    <Compile Include="Models\RecursiveDto.cs" />
+    <Compile Include="Models\RecursiveEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AddressTransformerService.cs" />
+    <Compile Include="Services\CountryService.cs" />
+    <Compile Include="Services\PhoneNumberFormatter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\StructuredMapper\StructuredMapper.csproj">

@@ -10,41 +10,64 @@ namespace StructuredMapper
         where TTo : new()
     {
         private readonly HashSet<string> _expressionBodies = new HashSet<string>();
-        private readonly List<Func<TFrom, TTo, Task<TTo>>> _mappers = new List<Func<TFrom, TTo, Task<TTo>>>();
+        private readonly List<Func<TFrom, TTo, Task<TTo>>> _propertyMappers = new List<Func<TFrom, TTo, Task<TTo>>>();
+        private readonly List<Func<TFrom, Task<TTo>>> _objectMappers = new List<Func<TFrom, Task<TTo>>>();
 
         /// <summary>
         /// Describes a mapping that will executed asynchronously.
         /// </summary>
-        public MapperBuilder<TFrom, TTo> For<TToProp>(
+        public MapperBuilder<TFrom, TTo> ForProperty<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
             Func<TFrom, Task<TToProp>> mapper)
         {
-            ThrowIfRegistered(toSelector.Body);
+            ThrowIfAlreadyRegistered(toSelector.Body);
             var propertyMapper = new PropertyMapper<TFrom, TTo, TToProp>(toSelector, mapper);
-            _mappers.Add(propertyMapper.Map);
+            _propertyMappers.Add(propertyMapper.Map);
             return this;
         }
         
         /// <summary>
-        /// Describes a mapping that will executed synchronously.
+        /// Describes a property mapping that will executed synchronously.
         /// </summary>
-        public MapperBuilder<TFrom, TTo> For<TToProp>(
+        public MapperBuilder<TFrom, TTo> ForProperty<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
-            Func<TFrom, TToProp> mapper)
+            Func<TFrom, TToProp> mapFunc)
         {
-            ThrowIfRegistered(toSelector.Body);
-            var propertyMapper = new PropertyMapper<TFrom, TTo, TToProp>(toSelector, mapper);
-            _mappers.Add(propertyMapper.Map);
+            ThrowIfAlreadyRegistered(toSelector.Body);
+            var propertyMapper = new PropertyMapper<TFrom, TTo, TToProp>(toSelector, mapFunc);
+            _propertyMappers.Add(propertyMapper.Map);
             return this;
         }
 
+        /// <summary>
+        /// Describes an object mapping that will execute synchronously.
+        /// </summary>
+        public MapperBuilder<TFrom, TTo> ForObject(
+            Expression<Func<TTo, TTo>> objectExpression,
+            Func<TFrom, TTo> mapFunc)
+        {
+            ThrowIfAlreadyRegistered(objectExpression.Body);
+            var mapper = new ObjectMapper<TFrom, TTo>(objectExpression, mapFunc);
+            _objectMappers.Add(mapper.Map);            
+            return this;
+        }
+        
+        /// <summary>
+        /// Describes an object mapping that will execute asynchronously.
+        /// </summary>
+        public MapperBuilder<TFrom, TTo> ForObject(
+            Expression<Func<TTo, TTo>> objectExpression,
+            Func<TFrom, Task<TTo>> mapFunc)
+        {
+            ThrowIfAlreadyRegistered(objectExpression.Body);
+            var mapper = new ObjectMapper<TFrom, TTo>(objectExpression, mapFunc);
+            _objectMappers.Add(mapper.Map);            
+            return this;
+        }
+        
         public Func<TFrom, Task<TTo>> Build()
         {
-            if (!_mappers.Any())
-            {
-                var msg = $"Nothing to map. Call the {nameof(For)} method before calling {nameof(Build)}.";
-                throw new InvalidOperationException(msg);
-            }
+            ThrowIfNoMappers();
             
             return async from =>
             {
@@ -52,14 +75,28 @@ namespace StructuredMapper
                 {
                     return default(TTo);
                 }
+                
                 var to = new TTo();
-                var tasks = _mappers.Select(mapper => mapper(from, to)).ToList();
+                var tasks = _propertyMappers.Select(mapper => mapper(from, to))
+                    .Concat(_objectMappers.Select(mapper => mapper(from)))
+                    .ToList();
                 await Task.WhenAll(tasks);
                 return await tasks.First();
             };
         }
+        
+        private void ThrowIfNoMappers()
+        {
+            if (_propertyMappers.Any() || _objectMappers.Any())
+            {
+                return;
+            }
+            
+            var msg = $"Nothing to map. Call the {nameof(ForObject)} method before calling {nameof(Build)}.";
+            throw new InvalidOperationException(msg);
+        }
 
-        private void ThrowIfRegistered(Expression exp)
+        private void ThrowIfAlreadyRegistered(Expression exp)
         {
             if (_expressionBodies.Contains(exp.ToString()))
             {

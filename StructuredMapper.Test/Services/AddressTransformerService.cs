@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using StructuredMapper.Models;
+using StructuredMapper.Test.Models;
 
-namespace StructuredMapper.Services
+namespace StructuredMapper.Test.Services
 {
     public class AddressTransformerService
     {

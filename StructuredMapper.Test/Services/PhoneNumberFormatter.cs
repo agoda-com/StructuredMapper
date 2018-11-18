@@ -1,4 +1,4 @@
-namespace StructuredMapper.Services
+namespace StructuredMapper.Test.Services
 {
     public static class PhoneNumberFormatter
     {

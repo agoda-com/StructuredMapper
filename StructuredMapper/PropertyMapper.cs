@@ -4,23 +4,29 @@ using System.Threading.Tasks;
 
 namespace StructuredMapper
 {
-    internal class PropertyMapper<TFrom, TTo, TToProp>
+    internal class PropertyMapper<TFrom, TTo, TToProp> 
+        where TTo : new()
     {
         private readonly Func<TFrom, TToProp> _syncMapper;
         private readonly Func<TFrom, Task<TToProp>> _asyncMapper;
-        private readonly Action<TTo, TToProp> _setProperty;
+        private readonly Lazy<Action<TTo, TToProp>> _setProperty;
 
         private PropertyMapper(Expression<Func<TTo, TToProp>> toExpression)
         {
-            if (toExpression.Body.NodeType != ExpressionType.MemberAccess)
+            var nodeType = toExpression.Body.NodeType;
+            if (nodeType != ExpressionType.MemberAccess)
             {
                 var msg =
                     $"The supplied {nameof(ExpressionType)} should be of type {nameof(ExpressionType.MemberAccess)}. " +
-                    $"Instead, an {nameof(ExpressionType)} of {toExpression.Body.NodeType} was supplied. " +
+                    $"Instead, an {nameof(ExpressionType)} of {nodeType} was supplied. " +
                     $"Expression should be something like to => to.TargetProperty.";
+                if (nodeType == ExpressionType.Parameter)
+                {
+                    msg += $" (Did you mean to use the {nameof(MapperBuilder<TFrom, TTo>.ForProperty)} method instead?)";
+                }
                 throw new ArgumentException(msg, nameof(toExpression)); 
             }
-            _setProperty = CompileSetter(toExpression); 
+            _setProperty = new Lazy<Action<TTo, TToProp>>(() => CompileSetter(toExpression)); 
         }
         
         /// <summary>
@@ -53,13 +59,13 @@ namespace StructuredMapper
         /// <returns></returns>
         public async Task<TTo> Map(TFrom from, TTo to)
         {
-            if (_syncMapper != null)
+            if (_asyncMapper != null)
             {
-                _setProperty(to, _syncMapper(from));
+                _setProperty.Value(to, await _asyncMapper(from));
             }
             else
             {
-                _setProperty(to, await _asyncMapper(from));
+                _setProperty.Value(to, _syncMapper(from));
             }
 
             return to;

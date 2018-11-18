@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace StructuredMapper.Services
+namespace StructuredMapper.Test.Services
 {
     public interface ICountryService
     {
