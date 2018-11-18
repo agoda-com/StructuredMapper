@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredMapper", "StructuredMapper\StructuredMapper.csproj", "{C12A295A-7140-44B9-A591-9E47FC4984DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredMapper.Test", "StructuredMapper.Test\StructuredMapper.Test.csproj", "{56E8275E-8D80-4C24-8F0B-5337C26E2C1E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C12A295A-7140-44B9-A591-9E47FC4984DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C12A295A-7140-44B9-A591-9E47FC4984DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C12A295A-7140-44B9-A591-9E47FC4984DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C12A295A-7140-44B9-A591-9E47FC4984DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56E8275E-8D80-4C24-8F0B-5337C26E2C1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56E8275E-8D80-4C24-8F0B-5337C26E2C1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56E8275E-8D80-4C24-8F0B-5337C26E2C1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56E8275E-8D80-4C24-8F0B-5337C26E2C1E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
