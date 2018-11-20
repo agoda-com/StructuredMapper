@@ -1,4 +1,4 @@
-﻿namespace StructuredMapper.BL.Customers
+﻿namespace StructuredMapper.BL.Geography
 {
     public class Address
     {

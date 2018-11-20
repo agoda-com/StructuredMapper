@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace StructuredMapper.BL.Countries
+namespace StructuredMapper.BL.Geography
 {
     public interface ICountryService
     {

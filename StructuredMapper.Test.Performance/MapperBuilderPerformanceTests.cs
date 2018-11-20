@@ -3,55 +3,50 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using StructuredMapper.BL.Customers;
+using StructuredMapper.BL.Geography;
 using StructuredMapper.Test.Api.Customers;
 
 namespace StructuredMapper.Test.Performance
 {
+    /// <summary>
+    /// Warning! These tests take a while to run, and include a warm up phase of 60 seconds before you'll see anything
+    /// happening to get the CPU good and hot, hopefully mitigating any thermal throttling that might skew the results.
+    /// </summary>
     public class MapperBuilderPerformanceTests
     {
-        private const int ITERATIONS = 100_000;
+        private const int ITERATIONS = 1_000_000;
         
         private readonly Customer _customer = new Customer
         {
             FirstName = "Mike",
             Surname = "Chamberlain",
-            PhoneNumber = "0971143378",
-            HomeAddress = new Address
-            {
-                Street = "3 Some Lane",
-                Area = "Area",
-                Province = "Province",
-                Zipcode = "0000",
-                CountryId = 1
-            },
-            BusinessAddress = new Address
-            {
-                Street = "3 Some Lane",
-                Area = "Area",
-                Province = "Province",
-                Zipcode = "0000",
-                CountryId = 1
-            },
-            ShippingAddress = new Address
-            {
-                Street = "1 Ship Lane",
-                Area = "Area",
-                Province = "Province",
-                Zipcode = "0000",
-                CountryId = 1
-            },
-            CustomerNumber = 12345,
-            DateJoined = new DateTime(1990, 1, 1)
         };
 
         private Stopwatch _stopwatch;
 
+        public MapperBuilderPerformanceTests()
+        {
+            // rev up the engines
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            while (true)
+            {
+                if (stopwatch.Elapsed.TotalSeconds > 60)
+                {
+                    break;
+                }
+            }
+        }
+        
         [SetUp]
         public void SetUp()
         {
             _stopwatch = new Stopwatch();
         }
        
+        /// <remarks>
+        /// 1255ms = 0.001255ms per map.
+        /// </remarks>
         [Test]
         public async Task Map_WhenAsyncMapperIsReused()
         {
@@ -70,6 +65,9 @@ namespace StructuredMapper.Test.Performance
             PrintResults();
         }
 
+        /// <remarks>
+        /// 363343ms = 0.363343ms per map.
+        /// </remarks>
         [Test]
         public async Task Map_WhenAsyncMapperIsRecreated()
         {
@@ -88,6 +86,9 @@ namespace StructuredMapper.Test.Performance
             PrintResults();
         }
         
+        /// <remarks>
+        /// 984ms = 0.000984ms per map.
+        /// </remarks>
         [Test]
         public void Map_WhenSynchronousMapperIsReused()
         {
@@ -106,9 +107,12 @@ namespace StructuredMapper.Test.Performance
             _stopwatch.Stop();
             PrintResults();
         }
-
+        
+        /// <remarks>
+        /// 363282ms = 0.363282ms per map.
+        /// </remarks>
         [Test]
-        public void Map_WhenSynchrousMapperIsRecreated()
+        public void Map_WhenSynchronousMapperIsRecreated()
         {
             _stopwatch.Start();
             
@@ -117,7 +121,7 @@ namespace StructuredMapper.Test.Performance
                 var mapper = new MapperBuilder<Customer, ContactDto>()
                     .For(to => to.First, "Mike")
                     .For(to => to.Last,  "Chamberlain")
-                    .Build();
+                    .BuildSync();
                 var mapped = mapper(_customer);
             }
             
@@ -128,7 +132,7 @@ namespace StructuredMapper.Test.Performance
         private void PrintResults()
         {
             Console.WriteLine(
-                $"{_stopwatch.ElapsedMilliseconds}ms = " +              
+                $"{ITERATIONS} iterations took {_stopwatch.ElapsedMilliseconds}ms @ " +              
                 $"{(double) _stopwatch.ElapsedMilliseconds / (double) ITERATIONS}ms per map.");
         }
     }

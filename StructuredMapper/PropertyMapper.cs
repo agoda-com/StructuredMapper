@@ -73,17 +73,15 @@ namespace StructuredMapper
 
         private static Action<TTo, TToProp> CompileSetter(Expression<Func<TTo, TToProp>> toExpression) 
         { 
-            // Input model 
+            // get target prop 
             var toProp = toExpression.Parameters[0]; 
-            // Input value to set 
+            // declare value to set 
             var value = Expression.Variable(typeof(TToProp), "toProperty"); 
-            // Member access 
-            var member = toExpression.Body; 
-            // We turn the access into an assignation to the input value 
-            var assignation = Expression.Assign(member, value); 
-            // We wrap the action into a lambda expression with parameters 
+            // create the expression to assign the value to the property
+            var assignation = Expression.Assign(toExpression.Body, value); 
+            // wrap the action into a lambda expression with parameters 
             var assignLambda = Expression.Lambda<Action<TTo, TToProp>>(assignation, toProp, value);
-
+            // compile the lambda and return
             return assignLambda.Compile();
         }
     }

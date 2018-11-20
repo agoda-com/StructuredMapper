@@ -1,14 +1,18 @@
 using System;
 using System.Threading.Tasks;
 
-namespace StructuredMapper.BL.Countries
+namespace StructuredMapper.BL.Geography
 {
     public class CountryService : ICountryService
     {
+        public CountryService()
+        {
+            // inject CMS here
+        }
+        
         public Task<string> GetCountryName(int countryId)
         {
-            // look up name for countryId from somewhere here
-            //...
+            // look up name for countryId from somewhere
 
             switch (countryId)
             {

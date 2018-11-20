@@ -12,6 +12,7 @@ namespace StructuredMapper.Test.Api.Controllers
 
         public CustomersController()
         {
+            // should be injected
             _customerDtoService = new CustomerDtoService();
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using StructuredMapper.BL.Geography;
 
 namespace StructuredMapper.BL.Customers
 {

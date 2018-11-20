@@ -38,35 +38,13 @@ namespace StructuredMapper.Test.Api
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
-            
-            app.UseExceptionHandler(errorApp =>
+            app.UseMvc(routes =>
             {
-                errorApp.Run(async context =>
-                {
-                    context.Response.StatusCode = 500; // or another Status accordingly to Exception Type
-                    context.Response.ContentType = "application/json";
-
-                    var error = context.Features.Get<IExceptionHandlerFeature>();
-                    if (error != null)
-                    {
-                        var ex = error.Error;
-
-                        await context.Response.WriteAsync(new ErrorDto
-                        {
-                            Code = 500,
-                            Message = ex.Message // or your custom message
-                            // other custom data
-                        }.ToString(), Encoding.UTF8);
-                    };
-                });
+                routes.MapRoute(
+                    name: "default",
+                    defaults: "1",
+                    template: "{controller=Customers}/{id=1}");
             });
         }
-    }
-
-    public class ErrorDto
-    {
-        public int Code { get; set; }
-        public string Message { get; set; }
     }
 }

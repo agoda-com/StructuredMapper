@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using StructuredMapper.BL.Countries;
 using StructuredMapper.BL.Customers;
+using StructuredMapper.BL.Geography;
 using StructuredMapper.Test.Api.Customers;
 using StructuredMapper.Test.Api.Helpers;
 
@@ -15,14 +15,11 @@ namespace StructuredMapper.Test
     {
         private Customer _customer;
         private AddressDtoService _addressService;
-        private RecursiveEntity _recursiveEntity;
 
         [SetUp]
         public void Setup()
         {
-            var countryServiceMock = new Mock<ICountryService>();
-            countryServiceMock.Setup(s => s.GetCountryName(It.IsAny<int>())).Returns(Task.FromResult("Thailand"));
-            _addressService = new AddressDtoService(countryServiceMock.Object);
+            _addressService = new AddressDtoService();
 
             _customer = new Customer
             {
@@ -55,11 +52,6 @@ namespace StructuredMapper.Test
                 },
                 CustomerNumber = 12345,
                 DateJoined = new DateTime(1990, 1, 1)
-            };
-
-            _recursiveEntity = new RecursiveEntity
-            {
-                Recursive = new RecursiveEntity()
             };
         }
 
@@ -106,7 +98,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task For_WithLiteralValue_Works()
+        public async Task For_WithLiteralValue_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.First, "Mike")
@@ -118,7 +110,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task For_WithAsyncLiteralValue_Works()
+        public async Task For_WithAsyncLiteralValue_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.First, Task.FromResult("Mike"))
@@ -130,7 +122,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task For_WithSimpleProperty_Works()
+        public async Task For_WithMemberAccess_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.First, from => "Mike")
@@ -142,7 +134,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task For_WithComplexProperty_Works()
+        public async Task For_WithNestedMemberAccess_MapsCorrectly()
         {
             var customerMapper = new MapperBuilder<Customer, CustomerDto>()
                 .For(to => to.Contact.First, from => from.FirstName)
@@ -154,7 +146,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task For_WithStaticMapper_Works()
+        public async Task For_WithSynchronousMapper_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.PhoneNumber, from => PhoneNumberFormatter.ToInternational(from.PhoneNumber, from.HomeAddress.CountryId))
@@ -166,7 +158,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task For_WithAsyncMapper_Works()
+        public async Task For_WithAsyncMapper_MapsCorrectly()
         {   
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.HomeAddress, from => _addressService.Transform(from.HomeAddress))
@@ -179,7 +171,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Build_WithComposition_Works()
+        public async Task For_WithComposition_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.PhoneNumber, from => PhoneNumberFormatter.ToInternational(from.PhoneNumber, from.HomeAddress.CountryId))
@@ -195,7 +187,7 @@ namespace StructuredMapper.Test
         }
 
         [Test]
-        public void BuildSync_Works()
+        public void BuildSync_MapsCorrectly()
         {
             var mapper = new MapperBuilder<Customer, CustomerDto>()
                 .For(to => to.DateJoined, from => from.DateJoined.ToString(CultureInfo.InvariantCulture))
@@ -207,7 +199,7 @@ namespace StructuredMapper.Test
         }
         
         [Test]
-        public async Task Build_WithFullExample_Works()
+        public async Task Build_WithFullExample_MapsCorrectly()
         {                
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.First,          "Mikey")

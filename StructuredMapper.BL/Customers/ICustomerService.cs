@@ -1,7 +1,9 @@
+using System.Threading.Tasks;
+
 namespace StructuredMapper.BL.Customers
 {
     public interface ICustomerService
     {
-        Customer GetById(int id);
+        Task<Customer> GetById(int id);
     }
 }

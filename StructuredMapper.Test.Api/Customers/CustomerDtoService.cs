@@ -1,26 +1,25 @@
 using System.Globalization;
 using System.Threading.Tasks;
-using StructuredMapper.BL.Countries;
 using StructuredMapper.BL.Customers;
+using StructuredMapper.BL.Geography;
 using StructuredMapper.Test.Api.Helpers;
 
 namespace StructuredMapper.Test.Api.Customers
 {
     public class CustomerDtoService
     {
-        private readonly CustomerService _customerService;
+        private readonly ICustomerService _customerService;
         private readonly AddressDtoService _addressDtoService;
 
         public CustomerDtoService()
         {
+            // should be injected
             _customerService = new CustomerService();
-            _addressDtoService = new AddressDtoService(new CountryService());
+            _addressDtoService = new AddressDtoService();
         }
         
         public async Task<CustomerDto> GetById(int id)
         {
-            var customer = _customerService.GetById(id);
-        
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.First,          from => from.FirstName)
                 .For(to => to.Last,           from => from.Surname)
@@ -35,6 +34,7 @@ namespace StructuredMapper.Test.Api.Customers
                 .For(to => to.Contact,    customerContactMapper)
                 .Build();
 
+            var customer = await _customerService.GetById(id);
             return await customerMapper(customer);
         }
     }
