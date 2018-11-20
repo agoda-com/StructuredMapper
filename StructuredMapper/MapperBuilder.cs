@@ -18,7 +18,7 @@ namespace StructuredMapper
         /// <summary>
         /// Describes a mapping that will executed asynchronously.
         /// </summary>
-        public MapperBuilder<TFrom, TTo> ForProperty<TToProp>(
+        public MapperBuilder<TFrom, TTo> For<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
             Func<TFrom, Task<TToProp>> mapper)
         {
@@ -32,7 +32,7 @@ namespace StructuredMapper
         /// <summary>
         /// Describes a property mapping that will executed synchronously.
         /// </summary>
-        public MapperBuilder<TFrom, TTo> ForProperty<TToProp>(
+        public MapperBuilder<TFrom, TTo> For<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
             Func<TFrom, TToProp> mapFunc)
         {
@@ -45,21 +45,21 @@ namespace StructuredMapper
         /// <summary>
         /// Describes a property mapping to a literal value retrieved asynchronously.
         /// </summary>
-        public MapperBuilder<TFrom, TTo> ForProperty<TToProp>(
+        public MapperBuilder<TFrom, TTo> For<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
             Task<TToProp> value)
         {
-            return ForProperty(toSelector, _ => value);
+            return For(toSelector, _ => value);
         }
         
         /// <summary>
         /// Describes a property mapping to a literal value retrieved synchronously.
         /// </summary>
-        public MapperBuilder<TFrom, TTo> ForProperty<TToProp>(
+        public MapperBuilder<TFrom, TTo> For<TToProp>(
             Expression<Func<TTo, TToProp>> toSelector,
             TToProp value)
         {
-            return ForProperty(toSelector, _ => value);
+            return For(toSelector, _ => value);
         }
 
         /// <summary>

@@ -1,11 +1,11 @@
 using System;
 
-namespace StructuredMapper.Test.Models
+namespace StructuredMapper.Test.Api.Customers
 {
     public class CustomerDto
     {
-        public string CustomerId { get; set; }
-        public DateTime DateJoined { get; set; }
+        public int CustomerId { get; set; }
+        public string DateJoined { get; set; }
         public ContactDto Contact { get; set; } = new ContactDto();
     }
     
@@ -26,4 +26,5 @@ namespace StructuredMapper.Test.Models
         public string CountryName { get; set; }
         public string Postcode { get; set; }
     }
+    
 }

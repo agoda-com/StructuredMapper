@@ -1,4 +1,4 @@
-﻿namespace StructuredMapper.Test.Models
+﻿namespace StructuredMapper.Test
 {
     public class RecursiveEntity
     {

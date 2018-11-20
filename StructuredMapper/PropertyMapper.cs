@@ -22,7 +22,7 @@ namespace StructuredMapper
                     $"Expression should be something like to => to.TargetProperty.";
                 if (nodeType == ExpressionType.Parameter)
                 {
-                    msg += $" (Did you mean to use the {nameof(MapperBuilder<TFrom, TTo>.ForProperty)} method instead?)";
+                    msg += $" (Did you mean to use the {nameof(MapperBuilder<TFrom, TTo>.For)} method instead?)";
                 }
                 throw new ArgumentException(msg, nameof(toExpression)); 
             }
