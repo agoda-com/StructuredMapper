@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredMapper.Test.Api",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredMapper.BL", "StructuredMapper.BL\StructuredMapper.BL.csproj", "{9321E3B2-636A-4EBB-9331-D549B6F4977A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructuredMapper.Test.Performance", "StructuredMapper.Test.Performance\StructuredMapper.Test.Performance.csproj", "{B6AF4DA3-D5E8-447B-A450-FFB723681423}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{9321E3B2-636A-4EBB-9331-D549B6F4977A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9321E3B2-636A-4EBB-9331-D549B6F4977A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9321E3B2-636A-4EBB-9331-D549B6F4977A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6AF4DA3-D5E8-447B-A450-FFB723681423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6AF4DA3-D5E8-447B-A450-FFB723681423}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6AF4DA3-D5E8-447B-A450-FFB723681423}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6AF4DA3-D5E8-447B-A450-FFB723681423}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
