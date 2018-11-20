@@ -27,7 +27,7 @@ public async Task<CustomerDto> GetById(int id)
         .For(to => to.Contact,        customerContactMapper) // composition with the mapper above
         .Build();
 
-    var customer = await _customerService.GetById(id); // defined in the [business logic layer](/StructuredMapper.BL)
+    var customer = await _customerService.GetById(id); // defined in StructuredMapper.BL
     var customerDto = await customerMapper(customer);
     return customerDto;
 }
