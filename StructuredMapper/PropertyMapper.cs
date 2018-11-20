@@ -20,10 +20,6 @@ namespace StructuredMapper
                     $"The supplied {nameof(ExpressionType)} should be of type {nameof(ExpressionType.MemberAccess)}. " +
                     $"Instead, an {nameof(ExpressionType)} of {nodeType} was supplied. " +
                     $"Expression should be something like to => to.TargetProperty.";
-                if (nodeType == ExpressionType.Parameter)
-                {
-                    msg += $" (Did you mean to use the {nameof(MapperBuilder<TFrom, TTo>.For)} method instead?)";
-                }
                 throw new ArgumentException(msg, nameof(toExpression)); 
             }
             _setProperty = new Lazy<Action<TTo, TToProp>>(() => CompileSetter(toExpression)); 

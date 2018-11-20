@@ -93,7 +93,7 @@ namespace StructuredMapper
         /// </summary>
         /// <remarks>
         /// This method builds a synchronous version of the mapper and can only be called when no asynchronous mappers
-        /// have been defined.
+        /// have been declared.
         /// </remarks>>
         /// <returns>
         /// A mapping function that executes synchronously.
@@ -133,7 +133,7 @@ namespace StructuredMapper
             var expAsString = exp.ToString();
             if (_expressionBodies.Contains(expAsString))
             {
-                var msg = $"Multiple mappings for property {expAsString} were defined.";
+                var msg = $"Multiple mappings for property {expAsString} were declared.";
                 throw new InvalidOperationException(msg);
             }
 
@@ -147,8 +147,8 @@ namespace StructuredMapper
                 return;
             }
 
-            var msg = $"Cannot build synchronous mapper when async mappers have been given." +
-                      $"(Did you mean to call {nameof(Build)}()?)";
+            var msg = $"Cannot build synchronous mapper when asynchronous mappers have been declared. " +
+                      $"Try calling {nameof(Build)}() instead.";
             throw new InvalidOperationException(msg);
         }
     }
