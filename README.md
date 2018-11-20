@@ -4,10 +4,10 @@
 - A large portion of the Agoda front end website is basically a huge mapping engine. So, make mapping the heart of the application, right at the HTTP entry point.
 - Untangle our endless layers of mappers and services.
 - Make it easy to reason about where a mapped value came from.
-- Make it easier for new developers to understand the application.
+- Make it easier for new (and seasoned) developers to understand the application.
 
 ## Example
-Here is a complete example of Structured Mapping in action. This would be called directly from the controller.
+Here is a complete example taken from the [`CustomerDtoService`](/StructuredMapper.Test.Api/Customers/CustomerDtoService.cs) in the [StructuredMapper.Test.Api](/StructuredMapper.Test.Api) project, It shows Structured Mapping from a [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to a [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). This would be called directly from the [controller](/StructuredMapper.Test.Api/Controllers/CustomersController.cs).
 
 ```c#
 public async Task<CustomerDto> GetById(int id)
@@ -27,14 +27,14 @@ public async Task<CustomerDto> GetById(int id)
         .For(to => to.Contact,        customerContactMapper) // composition with the mapper above
         .Build();
 
-    var customer = await _customerService.GetById(id); // defined in the business logic layer
+    var customer = await _customerService.GetById(id); // defined in the [business logic layer](/StructuredMapper.BL)
     var customerDto = await customerMapper(customer);
     return customerDto;
 }
 ```
 
 ## "IoM" (Inversion of Mapping)
-*The mappers call the services, instead of the services calling the mappers.*
+*Mappers call services. Services never call mappers.*
  
 Rather than services receiving, and arbitrarily mutating, the target object using mappers (which then gets passed to more services, which themselves call more mappers, etc etc), a Structured Mapper mapper clearly declares how each property is to be calculated, one by one.
 
@@ -53,6 +53,7 @@ Instead of an almost infinitely branching hierarchy of methods that the mapped o
 The target property that will receive the mapped value is described with an `Expression`. Both top level and nested properties are supported:
 - `to => to.FirstName`
 - `to => from.Contact.FirstName`    
+
 The latter is discouraged however, as unless the nested property (here `Contact`) is particularly trivial, it is probably better to give it its own mapper and compose it at the top level.
 
 ## Mapping from the source object
@@ -68,12 +69,12 @@ Each target property can by mapped from one of the following:
     - `from => _countryService.GetCountryName(from.CountryId)       // async service call`
     - Mapping methods can be synchronous or asynchronous. The latter will be transparently run concurrently, potentially improving performance.
 
-## The builder
-- Mappers are created with a builder, which returns a plain old function. The resulting mapping function can be either: 
-    - asynchronous by calling `Build()`
-        - returns `Task<Func<TSource, TTarget>>`
-    - or synchronous, by calling `BuildSync()` (only if no asynchronous mappers have been declared)
-        - returns `Func<TSource, TTarget>`
+## The [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs)
+Mappers are created with a builder, which returns a plain old function. The resulting mapping function can be either: 
+- asynchronous by calling `Build()`
+    - returns `Task<Func<TSource, TTarget>>`
+- or synchronous, by calling `BuildSync()` (only if no asynchronous mappers have been declared)
+    - returns `Func<TSource, TTarget>`
 
 Example:
 
@@ -88,10 +89,10 @@ var customerDto = mapper(customer);
 ```
 
 ## Race conditions
-A `MapperBuilder` will throw if a property is mapped more than once. However, it cannot check that other mappers do not attempt to map the same property. As long as each property is mapped once and once only, there should be no race conditions. Should two composed mappers attempt to map the same property, the last one to complete wins. For synchronous mappers, this will be the last declared in the chain. For asynchronous mappers, all bets are off. Remapping the same property in composed mapping functions should therefore be avoided.
+A [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs) will throw if a property is mapped more than once. However, it cannot check that other mappers do not attempt to map the same property. As long as each property is mapped once and once only, there should be no race conditions. Should two composed mappers attempt to map the same property, the last one to complete wins. For synchronous mappers, this will be the last declared in the chain. For asynchronous mappers, all bets are off. Remapping the same property in composed mapping functions should therefore be avoided.
  
 ## Performance
-Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs]()) as each setter expression must be compiled to a lambda. As a performance optimization, compilation is lazy, so will only occur the first time the property is actually mapped. Mapper build time increases linearly for each mapped property.
+Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs](/StructuredMapper.Test.Performance/MapperBuilderPerformanceTests.cs)) as each setter expression must be compiled to a lambda. As a performance optimization, compilation is lazy, so will only occur the first time the property is actually mapped. Mapper build time increases linearly for each mapped property.
 
 In performance testing on a trivial mapper of 2 properties, averaged over 1,000,000 iterations:
 - To build the mapper each time it is required takes ~0.36ms per mapping.
@@ -100,10 +101,10 @@ In this case it's about 300 times quicker to reuse a mapper than rebuild it each
 
 ## Live example
 - In either or VS or Rider, debug the `StructuredMapper.Test.Api` run configuration. 
-- A page will open displaying the serialized JSON result of a mapping from `Customer` to `CustomerDto`. Open those two files to see what was accomplished.
-- Open [CustomerController.cs]() and trace your way through the simple application.
-- Change the URL parameter from 1 to another number to see this reflected in the resulting mapped `CustomerId` property of the `CustomerDto`.
-- The values of the `Customer` source object are hard coded for the purposes of this demo project, as are all dependencies. Obviously, in a real application they would be fetched from the backend or injected respectively.
+- A page will open displaying the serialized JSON result of a mapping from [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). Open those two files to see what was accomplished.
+- Open [CustomerController.cs](/StructuredMapper/blob/master/StructuredMapper.Test.Api/Controllers/CustomersController.cs) and trace your way through the simple application.
+- Change the URL parameter from 1 to another number to see this reflected in the resulting mapped `CustomerId` property of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs).
+- The values of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs) source object are hard coded for the purposes of this demo project, as are all dependencies. Obviously, in a real application they would be fetched from the backend or injected respectively.
 
 ## Tests
-- A full test suite in the `StructuredMapper.Test` project.
+- See the [StructuredMapper.Test](/StructuredMapper.Test) project.
