@@ -74,7 +74,7 @@ Mapping methods can be synchronous or asynchronous. The latter will be transpare
 
 ## The [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs)
 Mappers are created with a builder, which returns a plain old function. The resulting function can either be: 
-- asynchronous by calling `Build()`
+- asynchronous, by calling `Build()`
     - returns `Task<Func<TSource, TTarget>>`
 - or synchronous, by calling `BuildSync()` (only if no asynchronous mappers have been declared)
     - returns `Func<TSource, TTarget>`
@@ -103,7 +103,7 @@ var customerDto = mapper(customer);
 A [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs) will throw if a property is mapped more than once. However, it cannot check that other mappers do not attempt to map the same property. As long as each property is mapped once and once only, there should be no race conditions. Should two composed mappers attempt to map the same property, the last one to complete wins. For synchronous mappers, this will be the last declared in the chain. For asynchronous mappers, all bets are off. Remapping the same property in composed mapping functions is therefore be highly discouraged.
  
 ## Performance
-Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs](/StructuredMapper.Test.Performance/MapperBuilderPerformanceTests.cs)) as each target expression must be [compiled](/StructuredMapper/PropertyMapper.cs#L70). As an optimization, compilation is lazy, so will only occur the first time the property is actually mapped. Mapper build time increases linearly for each mapped property. But there is good news.
+Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs](/StructuredMapper.Test.Performance/MapperBuilderPerformanceTests.cs)) as each target expression must be [compiled](/StructuredMapper/PropertyMapper.cs#L70) at runtime. As an optimization, compilation is lazy, so will only occur the first time the property is actually mapped. Mapper build time increases linearly for each mapped property. But there is good news.
 
 In performance testing on a trivial mapper of 2 properties, averaged over 1,000,000 iterations:
 - To rebuild the mapping function each time it is needed takes ~0.36ms per mapping.
