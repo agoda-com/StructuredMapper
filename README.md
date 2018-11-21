@@ -7,7 +7,7 @@
 - Make it easier for new (and seasoned) developers to understand the application.
 
 ## Example
-Here is a complete example taken from the [`CustomerDtoService`](/StructuredMapper.Test.Api/Customers/CustomerDtoService.cs) in the [StructuredMapper.Test.Api](/StructuredMapper.Test.Api) project, It shows Structured Mapping from a [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to a [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). This is called directly from the [controller](/StructuredMapper.Test.Api/Controllers/CustomersController.cs).
+Here is a complete example taken from the [`CustomerDtoService`](/StructuredMapper.Test.Api/Customers/CustomerDtoService.cs) in the [StructuredMapper.Test.Api](/StructuredMapper.Test.Api) project. It shows Structured Mapping from a [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to a [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). This is called directly from the [controller](/StructuredMapper.Test.Api/Controllers/CustomersController.cs).
 
 ```c#
 public async Task<CustomerDto> GetById(string id)
@@ -108,6 +108,7 @@ Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs](/St
 In performance testing on a trivial mapper of 2 properties, averaged over 1,000,000 iterations:
 - To rebuild the mapping function each time it is needed takes ~0.36ms per mapping.
 - But to build once then reuse the function takes only ~0.0013ms per mapping.
+
 In this case it's roughly 300 times quicker to reuse a mapping function than to rebuild it each time, so it's important to keep the mapping functions singletons.
 
 ## Tests
