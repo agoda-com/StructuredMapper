@@ -1,5 +1,6 @@
 using System;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StructuredMapper
@@ -22,7 +23,9 @@ namespace StructuredMapper
                     $"Expression should be something like to => to.TargetProperty.";
                 throw new ArgumentException(msg, nameof(toExpression)); 
             }
-            _setProperty = new Lazy<Action<TTo, TToProp>>(() => CompileSetter(toExpression)); 
+            _setProperty = new Lazy<Action<TTo, TToProp>>(
+                () => CompileSetter(toExpression),
+                LazyThreadSafetyMode.ExecutionAndPublication);
         }
         
         /// <summary>

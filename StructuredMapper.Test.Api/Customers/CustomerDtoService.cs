@@ -30,7 +30,7 @@ namespace StructuredMapper.Test.Api.Customers
                 .Build();
 
             var customerMapper = new MapperBuilder<Customer, CustomerDto>()
-                .For(to => to.CustomerNumber, "123") // literal
+                .For(to => to.CustomerNumber, id) // literal
                 .For(to => to.DateJoined,     from => from.DateJoined.ToString(new CultureInfo("th-th"))) // inline transformation
                 .For(to => to.Contact,        customerContactMapper) // composition with the mapper above
                 .Build();
