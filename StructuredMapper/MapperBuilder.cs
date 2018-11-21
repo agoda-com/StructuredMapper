@@ -10,7 +10,7 @@ namespace StructuredMapper
         where TTo : new()
     {
         private readonly HashSet<string> _expressionBodies = new HashSet<string>();
-        private readonly List<Func<TFrom, TTo, Task<TTo>>> _propertyMappers = new List<Func<TFrom, TTo, Task<TTo>>>();
+        private readonly List<Func<TFrom, TTo, Task<TTo>>> _mappers = new List<Func<TFrom, TTo, Task<TTo>>>();
 
         private bool _hasAsync = false;
 
@@ -18,12 +18,12 @@ namespace StructuredMapper
         /// Describes a mapping that will executed asynchronously.
         /// </summary>
         public MapperBuilder<TFrom, TTo> For<TToProp>(
-            Expression<Func<TTo, TToProp>> toSelector,
-            Func<TFrom, Task<TToProp>> mapper)
+            Expression<Func<TTo, TToProp>> propertyExpression,
+            Func<TFrom, Task<TToProp>> mappingFunc)
         {
-            ThrowIfAlreadyRegistered(toSelector.Body);
-            var propertyMapper = new PropertyMapper<TFrom, TTo, TToProp>(toSelector, mapper);
-            _propertyMappers.Add(propertyMapper.Map);
+            EnsurePropertyUnique(propertyExpression.Body);
+            var mapper = new PropertyMapper<TFrom, TTo, TToProp>(propertyExpression, mappingFunc);
+            _mappers.Add(mapper.Map);
             _hasAsync = true;
             return this;
         }
@@ -32,12 +32,12 @@ namespace StructuredMapper
         /// Describes a property mapping that will executed synchronously.
         /// </summary>
         public MapperBuilder<TFrom, TTo> For<TToProp>(
-            Expression<Func<TTo, TToProp>> toSelector,
-            Func<TFrom, TToProp> mapFunc)
+            Expression<Func<TTo, TToProp>> propertyExpression,
+            Func<TFrom, TToProp> mappingFunc)
         {
-            ThrowIfAlreadyRegistered(toSelector.Body);
-            var propertyMapper = new PropertyMapper<TFrom, TTo, TToProp>(toSelector, mapFunc);
-            _propertyMappers.Add(propertyMapper.Map);
+            EnsurePropertyUnique(propertyExpression.Body);
+            var mapper = new PropertyMapper<TFrom, TTo, TToProp>(propertyExpression, mappingFunc);
+            _mappers.Add(mapper.Map);
             return this;
         }
         
@@ -45,20 +45,20 @@ namespace StructuredMapper
         /// Describes a property mapping to a literal value retrieved asynchronously.
         /// </summary>
         public MapperBuilder<TFrom, TTo> For<TToProp>(
-            Expression<Func<TTo, TToProp>> toSelector,
+            Expression<Func<TTo, TToProp>> propertyExpression,
             Task<TToProp> value)
         {
-            return For(toSelector, _ => value);
+            return For(propertyExpression, _ => value);
         }
         
         /// <summary>
         /// Describes a property mapping to a literal value retrieved synchronously.
         /// </summary>
         public MapperBuilder<TFrom, TTo> For<TToProp>(
-            Expression<Func<TTo, TToProp>> toSelector,
+            Expression<Func<TTo, TToProp>> propertyExpression,
             TToProp value)
         {
-            return For(toSelector, _ => value);
+            return For(propertyExpression, _ => value);
         }
       
         /// <summary>
@@ -72,7 +72,7 @@ namespace StructuredMapper
         /// </returns>
         public Func<TFrom, Task<TTo>> Build()
         {
-            ThrowIfNoMappers();
+            EnsureMappersDeclared();
             
             return async from =>
             {
@@ -82,9 +82,9 @@ namespace StructuredMapper
                 }
                 
                 var to = new TTo();
-                var tasks = _propertyMappers.Select(mapper => mapper(from, to)).ToList();
+                var tasks = _mappers.Select(mapper => mapper(from, to));
                 await Task.WhenAll(tasks);
-                return await tasks.First();
+                return to;
             };
         }
         
@@ -100,8 +100,8 @@ namespace StructuredMapper
         /// </returns>
         public Func<TFrom, TTo> BuildSync()
         {
-            ThrowIfNoMappers();
-            ThrowIfHasAsync();
+            EnsureMappersDeclared();
+            EnsureNoAsyncMappers();
             
             return from =>
             {
@@ -111,15 +111,15 @@ namespace StructuredMapper
                 }
                 
                 var to = new TTo();
-                var tasks = _propertyMappers.Select(mapper => mapper(from, to)).ToArray();
+                var tasks = _mappers.Select(mapper => mapper(from, to)).ToArray();
                 Task.WaitAll(tasks);
-                return tasks.First().Result;
+                return to;
             };
         }
-
-        private void ThrowIfNoMappers()
+        
+        private void EnsureMappersDeclared()
         {
-            if (_propertyMappers.Any())
+            if (_mappers.Any())
             {
                 return;
             }
@@ -128,7 +128,7 @@ namespace StructuredMapper
             throw new InvalidOperationException(msg);
         }
 
-        private void ThrowIfAlreadyRegistered(Expression exp)
+        private void EnsurePropertyUnique(Expression exp)
         {
             var expAsString = exp.ToString();
             if (_expressionBodies.Contains(expAsString))
@@ -140,7 +140,7 @@ namespace StructuredMapper
             _expressionBodies.Add(expAsString);
         }
         
-        private void ThrowIfHasAsync()
+        private void EnsureNoAsyncMappers()
         {
             if (!_hasAsync)
             {

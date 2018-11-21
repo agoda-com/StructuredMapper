@@ -24,25 +24,16 @@ namespace StructuredMapper.Test.Api.Customers
             _stopwatch = new Stopwatch();
             _stopwatch.Start();
             _count = 0;
+
+            Transform = new MapperBuilder<Address, AddressDto>()
+                .For(to => to.Street, from => from.Street)
+                .For(to => to.Area, from => from.Area)
+                .For(to => to.State, from => from.Province)
+                .For(to => to.Postcode, from => from.Zipcode)
+                .For(to => to.CountryName, from => _countryService.GetCountryName(from.CountryId))
+                .Build();
         }
 
-        public async Task<AddressDto> Transform(Address address)
-        {   
-            var dto = new AddressDto
-            {
-                Street = address.Street,
-                Area = address.Area,
-                State = address.Province,
-                Postcode = address.Zipcode,
-                // if this class was replaced with a MapperBuilder, this call would also run concurrently
-                CountryName = await _countryService.GetCountryName(address.CountryId),
-            };
-            
-            // proving that async mappers run concurrently
-            await Task.Delay(1000);
-            Console.WriteLine($"Got address {++_count} after {_stopwatch.ElapsedMilliseconds}ms");
-            
-            return dto;
-        }
+        public Func<Address, Task<AddressDto>> Transform { get; }
     }
 }

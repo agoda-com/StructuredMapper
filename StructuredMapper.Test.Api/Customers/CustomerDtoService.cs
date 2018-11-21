@@ -27,7 +27,7 @@ namespace StructuredMapper.Test.Api.Customers
                 .For(to => to.HomeAddress,    from => _addressDtoSvc.Transform(from.Address)) // async service call
                 .For(to => to.OtherAddresses, from => 
                     Task.WhenAll(_addressDtoSvc.Transform(from.BusinessAddress), _addressDtoSvc.Transform(from.ShippingAddress)))
-                .Build();
+                    .Build();
 
             var customerMapper = new MapperBuilder<Customer, CustomerDto>()
                 .For(to => to.CustomerNumber, id) // literal
