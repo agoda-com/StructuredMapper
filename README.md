@@ -69,10 +69,11 @@ We then decide how to the target property should be mapped. This can be:
     - `from => PriceFormatter.Format(from.Price, from.CurrencyCode) // synchronous static method call`
     - `from => _countryService.GetCountryName(from.CountryId)       // async service call`
 - A previously built mapping method of the correct signature (composition).
+
 Mapping methods can be synchronous or asynchronous. The latter will be transparently run concurrently, potentially improving performance.
 
 ## The [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs)
-Mappers are created with a builder, which returns a plain old function. The resulting mapping function can be either: 
+Mappers are created with a builder, which returns a plain old function. The resulting function can be either: 
 - asynchronous by calling `Build()`
     - returns `Task<Func<TSource, TTarget>>`
 - or synchronous, by calling `BuildSync()` (only if no asynchronous mappers have been declared)
@@ -81,25 +82,25 @@ Mappers are created with a builder, which returns a plain old function. The resu
 Example:
 
 ```c#
-var mapper = new MapperBuilder<Customer, CustomerDto>().For(...);
+var builder = new MapperBuilder<Customer, CustomerDto>().For(...);
 
-var asyncMapper = mapper.Build();
+var asyncMapper = builder.Build();
 var customerDto = await mapper(customer);
 
-var syncMapper = mapper.BuildSync();
+var syncMapper = builder.BuildSync();
 var customerDto = mapper(customer);
 ```
 
-## Live example
+## Working example
 - Ensure you have the [.net Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-core/2.1) installed.
 - In either or VS or Rider, debug the `StructuredMapper.Test.Api` run configuration. 
-- A page will open displaying the serialized JSON result of a mapping from [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). Open those two files to see what was accomplished.
+- A page will open displaying the serialized JSON result of a mapping from [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). Take a look at those two files to see what was accomplished.
 - Open [CustomerController.cs](/StructuredMapper/blob/master/StructuredMapper.Test.Api/Controllers/CustomersController.cs) and trace your way through the simple application.
 - Change the URL parameter from 1 to another number to see this reflected in the resulting mapped `CustomerId` property of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs).
-- The values of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs) source object are hard coded for the purposes of this demo project, as are all dependencies. Obviously, in a real application they would be fetched from the backend or injected respectively.
+- The values of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs) source object are hard coded for the purposes of this demo project, as are all dependencies. Obviously, in a real application they would be fetched from the backend, or injected, respectively.
 
 ## Race conditions
-A [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs) will throw if a property is mapped more than once. However, it cannot check that other mappers do not attempt to map the same property. As long as each property is mapped once and once only, there should be no race conditions. Should two composed mappers attempt to map the same property, the last one to complete wins. For synchronous mappers, this will be the last declared in the chain. For asynchronous mappers, all bets are off. Remapping the same property in composed mapping functions should therefore be avoided.
+A [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs) will throw if a property is mapped more than once. However, it cannot check that other mappers do not attempt to map the same property. As long as each property is mapped once and once only, there should be no race conditions. Should two composed mappers attempt to map the same property, the last one to complete wins. For synchronous mappers, this will be the last declared in the chain. For asynchronous mappers, all bets are off. Remapping the same property in composed mapping functions is therefore be highly discouraged.
  
 ## Performance
 Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs](/StructuredMapper.Test.Performance/MapperBuilderPerformanceTests.cs)) as each target expression must be [compiled](/StructuredMapper/PropertyMapper.cs#L70). As an optimization, compilation is lazy, so will only occur the first time the property is actually mapped. Mapper build time increases linearly for each mapped property. But there is good news.
