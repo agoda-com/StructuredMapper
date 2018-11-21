@@ -46,7 +46,7 @@ Instead of an almost infinitely branching hierarchy of methods that the mapped o
 - We don't create the mapped object ourselves, or even have access to it as it is being mapped. This means we can no longer arbitrarily set its properties in random places throughout the code.
 - Ideally, this means a property is mapped in one place, and one place only.
 - A mapping function has access only to the source object, plus any dependencies it requires to perform its task. Each mapping function cannot read from or write to the target object's properties directly. It can only return the mapped value, which will be automatically be set to the target property by the Structured Mapper infrastructure.
-- This enforces discipline, both in the mappings and the services, making it much harder to accidentally (or purposefully) depend upon - or indeed overwrite - a mapped property. This prevents hard to find bugs, where our mapped value is overwritten by someone else. Such problems can require hours of careful step-through debugging to diagnose.
+- This enforces discipline, both in the mappings and the services, making it much harder to accidentally (or purposefully) depend upon - or indeed overwrite - an already mapped property. This prevents hard to find bugs, where our mapped value is overwritten by someone else. Such problems can require hours of careful step-through debugging to diagnose.
 - A Structured Mapper produces a function that can be passed into another such mapper. This makes them composable, and therefore reusable.
 - We can use the same paradigm to map a user request to a backend request as we can to map the backend response back to a user response. Used correctly, this results in an elegant symmetry that is easy to comprehend.
 
