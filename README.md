@@ -48,7 +48,7 @@ Instead of an almost infinitely branching hierarchy of methods that the mapped o
 - A mapping function has access only to the source object, plus any dependencies it requires to perform its task. Each mapping function cannot read from or write to the target object's properties directly. It can only return the mapped value, which will be automatically be set to the target property by the Structured Mapper infrastructure.
 - This enforces discipline, both in the mappings and the services, making it much harder to accidentally (or purposefully) depend upon - or indeed overwrite - an already mapped property. This prevents hard to find bugs, where our mapped value is overwritten by someone else. Such problems can require hours of careful step-through debugging to diagnose.
 - A Structured Mapper produces a function that can be passed into another such mapper. This makes them composable, and therefore reusable.
-- We can use the same paradigm to map a user request to a backend request as we can to map the backend response back to a user response. Used correctly, this results in an elegant symmetry that is easy to comprehend.
+- We can use the same paradigm to map a user request to a backend request, as we can to map the backend response back to the user response. Used correctly, this results in an elegant symmetry that is easy to comprehend.
 
 ## Mapping to the target object
 We first define the target property that will receive the mapped value with an `Expression`. Both top level and nested properties are supported:
@@ -68,8 +68,8 @@ We then decide how to the target property should be mapped. This can be:
 - Any method that returns an object of the correct type:
     - `from => PriceFormatter.Format(from.Price, from.CurrencyCode) // synchronous static method call`
     - `from => _countryService.GetCountryName(from.CountryId)       // async service call`
-    - Mapping methods can be synchronous or asynchronous. The latter will be transparently run concurrently, potentially improving performance.
-    - A previously built mapping method of the correct signature (composition).
+- A previously built mapping method of the correct signature (composition).
+Mapping methods can be synchronous or asynchronous. The latter will be transparently run concurrently, potentially improving performance.
 
 ## The [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs)
 Mappers are created with a builder, which returns a plain old function. The resulting mapping function can be either: 
