@@ -95,9 +95,9 @@ var customerDto = mapper(customer);
 - Ensure you have the [.net Core 2.1 SDK](https://www.microsoft.com/net/download/dotnet-core/2.1) installed.
 - In either or VS or Rider, debug the `StructuredMapper.Test.Api` run configuration. 
 - A page will open displaying the serialized JSON result of a mapping from [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). Take a look at those two files to see what was accomplished.
-- Open [CustomerController.cs](/StructuredMapper/blob/master/StructuredMapper.Test.Api/Controllers/CustomersController.cs) and trace your way through the simple application.
+- Open [CustomerController.cs](/StructuredMapper.Test.Api/Controllers/CustomersController.cs) and trace your way through the simple application.
 - Change the URL parameter from 1 to another number to see this reflected in the resulting mapped `CustomerId` property of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs).
-- The values of the [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs) source object are hard coded for the purposes of this demo project, as are all dependencies. Obviously, in a real application they would be fetched from the backend, or injected, respectively.
+- The values of the [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) source object are hard coded for the purposes of this demo project, as are all dependencies. Obviously, in a real application they would be fetched from the backend, or injected, respectively.
 
 ## Race conditions
 A [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs) will throw if a property is mapped more than once. However, it cannot check that other mappers do not attempt to map the same property. As long as each property is mapped once and once only, there should be no race conditions. Should two composed mappers attempt to map the same property, the last one to complete wins. For synchronous mappers, this will be the last declared in the chain. For asynchronous mappers, all bets are off. Remapping the same property in composed mapping functions is therefore be highly discouraged.
