@@ -106,8 +106,8 @@ A [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs) will throw if a property
 Building a mapper is relatively slow (see [MapperBuilderPerformanceTests.cs](/StructuredMapper.Test.Performance/MapperBuilderPerformanceTests.cs)) as each target expression must be [compiled](/StructuredMapper/PropertyMapper.cs#L70). As an optimization, compilation is lazy, so will only occur the first time the property is actually mapped. Mapper build time increases linearly for each mapped property. But there is good news.
 
 In performance testing on a trivial mapper of 2 properties, averaged over 1,000,000 iterations:
-- To rebuild the mapper each time it is needed takes ~0.36ms per mapping.
-- But to build once then reuse the mapper takes only ~0.0013ms per mapping.
+- To rebuild the mapping function each time it is needed takes ~0.36ms per mapping.
+- But to build once then reuse the function takes only ~0.0013ms per mapping.
 In this case it's roughly 300 times quicker to reuse a mapping function than to rebuild it each time, so it's important to keep the mapping functions singletons.
 
 ## Tests
