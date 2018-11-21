@@ -187,6 +187,18 @@ namespace StructuredMapper.Test
         }
 
         [Test]
+        public async Task For_WithNullSource_MapsToNull()
+        {
+            var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
+                .For(to => to.PhoneNumber, _ => (string) null)
+                .Build();
+
+            var mapped = await customerContactMapper(_customer);
+
+            Assert.IsNull(mapped.PhoneNumber);
+        }
+        
+        [Test]
         public void BuildSync_MapsCorrectly()
         {
             var mapper = new MapperBuilder<Customer, CustomerDto>()
