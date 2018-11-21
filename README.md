@@ -73,7 +73,7 @@ We then decide how to the target property should be mapped. This can be:
 Mapping methods can be synchronous or asynchronous. The latter will be transparently run concurrently, potentially improving performance.
 
 ## The [`MapperBuilder`](/StructuredMapper/MapperBuilder.cs)
-Mappers are created with a builder, which returns a plain old function. The resulting function can be either: 
+Mappers are created with a builder, which returns a plain old function. The resulting function can either be: 
 - asynchronous by calling `Build()`
     - returns `Task<Func<TSource, TTarget>>`
 - or synchronous, by calling `BuildSync()` (only if no asynchronous mappers have been declared)
