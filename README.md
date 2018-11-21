@@ -34,13 +34,14 @@ public async Task<CustomerDto> GetById(string id)
 ```
 
 ## "IoM" (Inversion of Mapping)
-*Mappers call services. Services never call mappers.*
+*Mappers should call services. Services should never call mappers.*
  
 Rather than services receiving, and arbitrarily mutating, the target object using mappers (which then gets passed to more services, which themselves call more mappers, etc etc), a Structured Mapper mapper clearly declares how each property is to be mapped, one by one.
 
 Instead of an almost infinitely branching hierarchy of methods that the mapped object must negotiate, it travels "straight down" through a Structured Mapper - or a composition of such mappers - mapping one property at a time.
 
 ## Advantages of Structured Mapping
+- Mapping - our website's main task once we hit the controller - is now front and center.
 - All mappings are declared in one place (or at least using one paradigm), making it trivial to see how we arrived at the mapped value.
 - We don't create the mapped object ourselves, or even have access to it as it is being mapped. This means we can no longer arbitrarily set its properties in random places throughout the code.
 - Ideally, this means a property is mapped in one place, and one place only.
