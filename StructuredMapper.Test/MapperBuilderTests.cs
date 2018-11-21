@@ -23,10 +23,12 @@ namespace StructuredMapper.Test
 
             _customer = new Customer
             {
+                CustomerId = "12345",
+                DateJoined = new DateTime(1990, 1, 1),
                 FirstName = "Mike",
                 Surname = "Chamberlain",
                 PhoneNumber = "0971143378",
-                HomeAddress = new Address
+                Address = new Address
                 {
                     Street = "3 Some Lane",
                     Area = "Area",
@@ -50,8 +52,6 @@ namespace StructuredMapper.Test
                     Zipcode = "0000",
                     CountryId = 1
                 },
-                CustomerNumber = 12345,
-                DateJoined = new DateTime(1990, 1, 1)
             };
         }
 
@@ -149,7 +149,7 @@ namespace StructuredMapper.Test
         public async Task For_WithSynchronousMapper_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
-                .For(to => to.PhoneNumber, from => PhoneNumberFormatter.ToInternational(from.PhoneNumber, from.HomeAddress.CountryId))
+                .For(to => to.PhoneNumber, from => Formatter.ToInternational(from.PhoneNumber, from.Address.CountryId))
                 .Build();
 
             var mapped = await customerContactMapper(_customer);
@@ -161,7 +161,7 @@ namespace StructuredMapper.Test
         public async Task For_WithAsyncMapper_MapsCorrectly()
         {   
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
-                .For(to => to.HomeAddress, from => _addressService.Transform(from.HomeAddress))
+                .For(to => to.HomeAddress, from => _addressService.Transform(from.Address))
                 .Build();
 
             var mapped = await customerContactMapper(_customer);
@@ -174,7 +174,7 @@ namespace StructuredMapper.Test
         public async Task For_WithComposition_MapsCorrectly()
         {
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
-                .For(to => to.PhoneNumber, from => PhoneNumberFormatter.ToInternational(from.PhoneNumber, from.HomeAddress.CountryId))
+                .For(to => to.PhoneNumber, from => Formatter.ToInternational(from.PhoneNumber, from.Address.CountryId))
                 .Build();
 
             var customerMapper = new MapperBuilder<Customer, CustomerDto>()
@@ -204,21 +204,21 @@ namespace StructuredMapper.Test
             var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
                 .For(to => to.First,          "Mikey")
                 .For(to => to.Last,           from => from.Surname)
-                .For(to => to.PhoneNumber,    from => PhoneNumberFormatter.ToInternational(from.PhoneNumber, from.HomeAddress.CountryId))
-                .For(to => to.HomeAddress,    from => _addressService.Transform(from.HomeAddress))
+                .For(to => to.PhoneNumber,    from => Formatter.ToInternational(from.PhoneNumber, from.Address.CountryId))
+                .For(to => to.HomeAddress,    from => _addressService.Transform(from.Address))
                 .For(to => to.OtherAddresses, from => Task.WhenAll(_addressService.Transform(from.BusinessAddress), _addressService.Transform(from.ShippingAddress)))
                 .Build();
 
             var customerMapper = new MapperBuilder<Customer, CustomerDto>()
-                .For(to => to.DateJoined, from => from.DateJoined.ToString(CultureInfo.InvariantCulture))
-                .For(to => to.CustomerId, from => from.CustomerNumber)
-                .For(to => to.Contact,    customerContactMapper)
+                .For(to => to.DateJoined,     from => from.DateJoined.ToString(CultureInfo.InvariantCulture))
+                .For(to => to.CustomerNumber, from => from.CustomerId)
+                .For(to => to.Contact,        customerContactMapper)
                 .Build();
 
             var mapped = await customerMapper(_customer);
 
             Assert.AreEqual("Mikey", mapped.Contact.First);
-            Assert.AreEqual(12345, mapped.CustomerId);
+            Assert.AreEqual("12345", mapped.CustomerNumber);
             Assert.AreEqual(_customer.DateJoined.ToString(CultureInfo.InvariantCulture), mapped.DateJoined);
             Assert.AreEqual("Thailand", mapped.Contact.OtherAddresses.First().CountryName);
             Assert.AreEqual(_customer.ShippingAddress.Street, mapped.Contact.OtherAddresses.ElementAt(1).Street);

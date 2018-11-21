@@ -4,7 +4,7 @@ namespace StructuredMapper.Test.Api.Customers
 {
     public class CustomerDto
     {
-        public int CustomerId { get; set; }
+        public string CustomerNumber { get; set; }
         public string DateJoined { get; set; }
         public ContactDto Contact { get; set; } = new ContactDto();
     }

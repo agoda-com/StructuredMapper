@@ -17,7 +17,7 @@ namespace StructuredMapper.Test.Api.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<JsonResult> Get(int id)
+        public async Task<JsonResult> Get(string id)
         {
             var customerDto = await _customerDtoService.GetById(id);
             return new JsonResult(customerDto);

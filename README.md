@@ -10,15 +10,15 @@
 Here is a complete example taken from the [`CustomerDtoService`](/StructuredMapper.Test.Api/Customers/CustomerDtoService.cs) in the [StructuredMapper.Test.Api](/StructuredMapper.Test.Api) project, It shows Structured Mapping from a [`Customer`](/StructuredMapper.BL/Customers/Customer.cs) to a [`CustomerDto`](/StructuredMapper.Test.Api/Customers/CustomerDto.cs). This is called directly from the [controller](/StructuredMapper.Test.Api/Controllers/CustomersController.cs).
 
 ```c#
-public async Task<CustomerDto> GetById(int id)
+public async Task<CustomerDto> GetById(string id)
 {
     var customerContactMapper = new MapperBuilder<Customer, ContactDto>()
         .For(to => to.First,          from => from.FirstName) // source member access
         .For(to => to.Last,           from => from.Surname)
-        .For(to => to.PhoneNumber,    from => PhoneNumberFormatter.ToInternational(from.PhoneNumber, from.HomeAddress.CountryId)) // static method
-        .For(to => to.HomeAddress,    from => _addressDtoService.Transform(from.HomeAddress)) // async service call
+        .For(to => to.PhoneNumber,    from => Formatter.ToInternational(from.PhoneNumber, from.Address.CountryId)) // static method
+        .For(to => to.HomeAddress,    from => _addressDtoSvc.Transform(from.Address)) // async service call
         .For(to => to.OtherAddresses, from => 
-            Task.WhenAll(_addressDtoService.Transform(from.BusinessAddress), _addressDtoService.Transform(from.ShippingAddress)))
+            Task.WhenAll(_addressDtoSvc.Transform(from.BusinessAddress), _addressDtoSvc.Transform(from.ShippingAddress)))
         .Build();
 
     var customerMapper = new MapperBuilder<Customer, CustomerDto>()

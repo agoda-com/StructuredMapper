@@ -11,17 +11,17 @@ namespace StructuredMapper.BL.Customers
             // inject repo here
         }
         
-        public Task<Customer> GetById(int id)
+        public Task<Customer> GetById(string id)
         {
             // IRL we retrieve this from a repo
             var customer = new Customer
             {
-                CustomerNumber = id,
+                CustomerId = id,
                 DateJoined = new DateTime(1990, 1, 1),
                 FirstName = "Mike",
                 Surname = "Chamberlain",
                 PhoneNumber = "0971143378",
-                HomeAddress = new Address
+                Address = new Address
                 {
                     Street = "The Room, 78/54 Thanon Pan",
                     Area = "Silom",

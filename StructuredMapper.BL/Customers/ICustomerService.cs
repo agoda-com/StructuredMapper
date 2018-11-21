@@ -4,6 +4,6 @@ namespace StructuredMapper.BL.Customers
 {
     public interface ICustomerService
     {
-        Task<Customer> GetById(int id);
+        Task<Customer> GetById(string id);
     }
 }

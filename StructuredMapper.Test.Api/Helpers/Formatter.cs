@@ -2,7 +2,7 @@ using System;
 
 namespace StructuredMapper.Test.Api.Helpers
 {
-    public static class PhoneNumberFormatter
+    public static class Formatter
     {
         public static string ToInternational(string localPhoneNumber, int countryId)
         {
