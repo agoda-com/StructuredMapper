@@ -68,7 +68,7 @@ We then decide how to the target property should be mapped. This can be:
 - Any method that returns an object of the correct type:
     - `from => PriceFormatter.Format(from.Price, from.CurrencyCode) // synchronous static method call`
     - `from => _countryService.GetCountryName(from.CountryId)       // async service call`
-- A previously built mapping method of the correct signature (composition).
+- A previously built mapping method of the correct signature (mapper composition).
 
 Mapping methods can be synchronous or asynchronous. The latter will be transparently run concurrently, potentially improving performance.
 
