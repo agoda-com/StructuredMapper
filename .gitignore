@@ -31,4 +31,41 @@ _ReSharper*/
 .vs/
 #Nuget packages folder
 packages/
-.idea/
+
+# Jetbrains IDEA-based IDEs
+#####################################################################################################
+#                                           READ!!!!!!!                                             #
+# DO NOT CHANGE THESE IDEA IGNORED FILES UNLESS YOU ARE ABSOLUTELY SURE YOU KNOW WHAT YOU ARE DOING #
+#                           See note below and hit up @mc if in doubt                               #
+#####################################################################################################
+/**/.idea/**/workspace.xml
+/**/.idea/**/tasks.xml
+/**/.idea/dictionaries
+/**/.idea/**/dataSources/
+/**/.idea/**/dataSources.ids
+/**/.idea/**/dataSources.xml
+/**/.idea/**/dataSources.local.xml
+/**/.idea/**/sqlDataSources.xml
+/**/.idea/**/dynamic.xml
+/**/.idea/**/uiDesigner.xml
+/**/.idea/**/gradle.xml
+/**/.idea/**/libraries
+/**/.idea/**/applicationhost.config
+/**/.idea/**/contentModel.xml
+/**/.idea/**/riderModule.iml
+/**/.idea/**/modules.xml
+#####################################################################################################
+# PLEASE NOTE                                                                                       #
+#                                                                                                   #
+# The above ignored files have been chosen carefully. In general, we want to check in all .idea     #
+# files to be shared amongst all developers, EXCEPT those above.                                    #
+#                                                                                                   #
+# EXAMPLE: We need to exclude the dist folder from being indexed by Rider else it will consume      #
+# all your CPU reindexing on each build. These exclusions are controlled by .idea/indexLayout.xml.  #
+# To save each dev having to create these exclusions manually, we check this file in to share       #
+# them across the whole team.                                                                       #
+#                                                                                                   #          
+# Please don't add anything here unless you are absolutely sure of what you are doing. @mc          #
+# - https://intellij-support.jetbrains.com/hc/en-us/articles/206544839                              #
+# - https://github.com/github/gitignore/blob/master/Global/JetBrains.gitignore                      #
+#####################################################################################################
